@@ -21,7 +21,7 @@ def centroid(region, img):
 def getregion(j, i, region, img):
     """Recursively adds all pixels above threshold to the array named region"""
     edge = j == img.shape[0] or i == img.shape[1] or j == -1*img.shape[0] or i == -1*img.shape[1]
-    if(len(region) > 60 or edge):
+    if(len(region) > 150 or edge):
         return
     if(img[j, i] <= thresh):
         return region
@@ -47,14 +47,14 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import time 
-
+import math
 
 n = 3 #Every nth pixel is checked
 centroids = []
 # Reading the images as arrays
-img = np.array(cv2.imread("image1.png", 0))
+img = np.array(cv2.imread("gen1.jpg", 0))
 img1 = img.copy()
-thresh = 10
+thresh = 40 #arbitrarily set threshold value for intensity value
 
 start = time.time()
 xlen = img.shape[1] #length of image in x
@@ -68,19 +68,24 @@ end = time.time()
 centroids = np.array(centroids) #converting into numpy array so it can be plotted 
 print("Total time taken = " +str((end-start)*1000)+" ms")
 print("Number of stars = " +str(centroids.shape[0]))
+centroids = np.array(sorted(centroids, key = lambda x:x[0])) #sorting by first element
 
 #This part is solely done to get a pictorial representation of the data obtained
 plt.rcParams['axes.facecolor'] = 'black'
+plt.xlim(0,640)
+plt.ylim(0,480)
+#plt.axis('off');
 x = []
 y = []
 for i in centroids:
     x.append(i[1])
-    y.append((-1)*i[0])
+    y.append((-1)*i[0]+480)
 plt.plot(x, y, 'w.', )
 
-#image = np.zeros(img.shape, dtype = np.uint8)
-#for m in centroids:
-#    image[m[0], m[1]] = 255
-#cv2.imshow('img', img1)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+#Done for making image of centroids
+image = np.zeros(img.shape, dtype = np.uint8)
+for m in centroids:
+    image[math.floor(m[0]), math.floor(m[1])] = 255
+cv2.imwrite('gen1_result.jpg', image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
